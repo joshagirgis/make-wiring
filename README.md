@@ -1,8 +1,8 @@
 make-wiring porting For Windows
 ===========
 Porting Earlz code to windows with minor adjustments for functunality.
-https://www.reddit.com/r/AskProgramming/comments/a19cdv/can_someone_show_me_how_to_implement_this_github/
 the full thought process is posted here.
+https://www.reddit.com/r/AskProgramming/comments/a19cdv/can_someone_show_me_how_to_implement_this_github/
 
 # Usage
 
