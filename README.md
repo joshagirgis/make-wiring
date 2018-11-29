@@ -7,8 +7,8 @@ Porting Earlz code to windows with minor adjustments for functunality.
 Usage is simple, install ruby, make sure you have winAVR.
 
    build command builds the .c and .cpp files in .o files and then compiles into a .a file:
-    ./build.rb build arduino
-    ./build.rb build Wire
+      ./build.rb build arduino
+      ./build.rb build Wire
     
    clean command deletes all .o files:
     ./build.rb clean arduino
