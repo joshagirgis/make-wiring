@@ -1,11 +1,10 @@
-default: build
-build: ${LIBOUT}
-rebuild: clean build
+default: init build
+build: init ${LIBOUT}
+rebuild: clean init build
 
 ${LIBOUT}:   ${OBJS}
 	${AR} crs ${LIBOUT} $(OBJS)
-	cp *.h ${OUTPUTS}/include/
-	cp ${LIBOUT} ${OUTPUTS}/lib/
+	mv ${LIBOUT} ${OUTPUTS}/lib/
 
 .c.o: ${HDRS}
 	${CC} ${CFLAGS} -c $*.c
@@ -13,5 +12,8 @@ ${LIBOUT}:   ${OBJS}
 .cpp.o: ${HDRS}
 	${CPP} ${CPPFLAGS} -c $*.cpp
 
+init:
+	cp ${HDRS} ${OUTPUTS}/include/
 clean:
-	rm -f *.o core a.out errs *.a
+	rm -f $(OBJS) 
+	

@@ -1,4 +1,5 @@
 #!/bin/ruby
+require 'fileutils'
 VARIANT='standard' #where to get the `pins_arduino.h` file
 CPUFREQ="16000000UL"
 MCU="atmega328p"
@@ -20,10 +21,11 @@ def getfiles(dir, ending)
   t=""
   Dir["#{dir}/*.#{ending}"].each{ |f|  t+='"'+File.basename(f)+'" '; }
   t
+  
 end
 
 def domake(src, action, objs,hdrs, cppflags, cflags, arflags, out, lib)
-  `make -C #{src} #{action} OBJS="#{objs}" CPPFLAGS="#{CPPFLAGS} #{cppflags}" CFLAGS="#{CFLAGS} #{cflags}"\
+   `make -C #{src} #{action} OBJS="#{objs}" CPPFLAGS="#{CPPFLAGS} #{cppflags}" CFLAGS="#{CFLAGS} #{cflags}"\
       ARFLAGS="#{arflags}" OUTPUTS="#{out}" HDRS="#{hdrs}" LIBOUT="#{lib}" \
       AR="#{AR}" CC="#{CC}" CPP="#{CPP}" \
       1>&2`
@@ -35,22 +37,30 @@ if ARGV.length < 2
   exit
 end
 
-`mkdir -p output/include`
-`mkdir -p output/lib`
+
+#`mkdir -p output/include` #syntax error
+#`mkdir -p output/lib`
+require 'fileutils'
+FileUtils.mkdir_p 'output/include'
+FileUtils.mkdir_p 'output/lib'
 `cp variants/#{VARIANT}/pins_arduino.h #{OUTPUTS}/include/`
 
-action=ARGV[0] 
-library=ARGV[1]
+action = ARGV[0] 
+library = ARGV[1]
 
 dir="#{SOURCES}/#{library}"
 `cp template.makefile #{SOURCES}/#{library}/Makefile`
-objs=getfiles(dir, "c").gsub(".c",".o");
-objs+=" "+getfiles(dir, "cpp").gsub(".cpp", ".o");
-out="../../#{OUTPUTS}"
-cflags="-I#{out}/include -I./ -I./utility/ -I../../variants/#{VARIANT} -I\"../../#{OUTPUTS}/include\" -mmcu=#{MCU} -DF_CPU=#{CPUFREQ}"
-cppflags=cflags
-hdrs=getfiles(dir, "h")
-arflags=""
+ objs = getfiles(dir, "c").gsub(".c",".o");
+ objs += " "+getfiles(dir, "cpp").gsub(".cpp", ".o");
+ print "\n"
+ out = "../../#{OUTPUTS}"
+ hdrs = getfiles(dir, "h")
+ cflags = "-I#{out}/include -I./#{SOURCES}/ -I./ -I./utility/ -I./variants/#{VARIANT} -I./#{OUTPUTS}/include -mmcu=#{MCU} -DF_CPU=#{CPUFREQ}"
+ cppflags = cflags
+ arflags = ""
 
-domake("#{dir}", action, objs, hdrs, cppflags, cflags, arflags, out, "lib#{library}.a")
-`rm -f "#{SOURCES}/#{library}/Makefile"`
+ domake("#{dir}", action, objs, hdrs, cppflags, cflags, arflags, out, "lib#{library}.a")
+ `rm -f "#{SOURCES}/#{library}/Makefile"`
+  print "done"
+ 
+
