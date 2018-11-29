@@ -1,17 +1,20 @@
-make-wiring
+make-wiring porting For Windows
 ===========
-
-I got fed up with it being difficult to build Arduino libraries from the command line/without the Arduino IDE..
-so I did something about it. 
-
-This is a copy of the Arduino libraries (placed in src), a Makefile template, and a fancy build helper written in Ruby
+Porting Earlz code to windows with minor adjustments for functunality.
 
 # Usage
 
-Usage is quite simple
+Usage is simple, install ruby, make sure you have winAVR.
 
-    ./build.sh build arduino
-    ./build.sh build Wire
+   build command builds the .c and .cpp files in .o files and then compiles into a .a file:
+    ./build.rb build arduino
+    ./build.rb build Wire
+    
+   clean command deletes all .o files:
+    ./build.rb clean arduino
+    
+   rebuild command cleans then builds:
+    ./build.rb clean arduino
     
 and afterwards, you'll have the relevant header files and compiled libraries in the `output` directory
 
@@ -20,6 +23,7 @@ There are three possible options for every library
 1. build -- This will build the library. It will not do more work than necessary
 2. clean -- This will remove all the compiled files from the src directory. It will not remove files from the output directory
 3. rebuild -- will clean and then build
+
 
 # Retargetting
 
@@ -36,6 +40,14 @@ If you're unsure of your board's "variant", frequency, or other variables, you c
 It should be straight forward to map your board's configuration to this build file for easy building of libraries.
 
 You can also tweak other parameters like `CFLAGS` to your liking as well.
+
+
+
+
+
+# I Havent gotten below this yet.
+
+
 
 # Usage from within programs
 
