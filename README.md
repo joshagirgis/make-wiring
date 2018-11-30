@@ -1,4 +1,4 @@
-make-wiring porting For Windows
+make-wiring ported For Windows
 ===========
 Porting Earlz code to windows with minor adjustments for functunality.
 the full thought process is posted here.
