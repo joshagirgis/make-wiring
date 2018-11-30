@@ -11,7 +11,8 @@ https://www.reddit.com/r/AskProgramming/comments/a19cdv/can_someone_show_me_how_
 3. rebuild -- will clean and then build
 
 Usage is simple, install ruby, make sure you have winAVR.
-build command builds the .c and .cpp files in .o files and then compiles into a .a file:
+
+build command builds the .c and .cpp files into .o files and then compiles into a .a file:
 
     ./build.rb build arduino
     ./build.rb build Wire
