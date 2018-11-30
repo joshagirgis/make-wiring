@@ -23,7 +23,7 @@ build command builds the .c and .cpp files into .o files and then compiles into 
     
    rebuild command cleans then builds:
    
-    ./build.rb clean arduino
+    ./build.rb rebuild arduino
     
 and afterwards, you'll have the relevant header files and compiled libraries in the `output/lib and output/include` directory
 
