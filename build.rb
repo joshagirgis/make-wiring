@@ -37,19 +37,15 @@ if ARGV.length < 2
   exit
 end
 
-
-#`mkdir -p output/include` #syntax error
-#`mkdir -p output/lib`
-require 'fileutils'
 FileUtils.mkdir_p 'output/include'
 FileUtils.mkdir_p 'output/lib'
-`cp variants/#{VARIANT}/pins_arduino.h #{OUTPUTS}/include/`
+FileUtils.cp "variants/#{VARIANT}/pins_arduino.h", "#{OUTPUTS}/include/"
 
 action = ARGV[0] 
 library = ARGV[1]
 
 dir="#{SOURCES}/#{library}"
-`cp template.makefile #{SOURCES}/#{library}/Makefile`
+ FileUtils.cp "template.makefile", #{SOURCES}/#{library}/Makefile`
  objs = getfiles(dir, "c").gsub(".c",".o");
  objs += " "+getfiles(dir, "cpp").gsub(".cpp", ".o");
  print "\n"
@@ -60,7 +56,7 @@ dir="#{SOURCES}/#{library}"
  arflags = ""
 
  domake("#{dir}", action, objs, hdrs, cppflags, cflags, arflags, out, "lib#{library}.a")
- `rm -f "#{SOURCES}/#{library}/Makefile"`
-  print "done"
+ FileUtils.rm_r "#{SOURCES}/#{library}/Makefile"`
+ print "done"
  
 
