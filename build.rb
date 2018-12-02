@@ -56,7 +56,7 @@ dir="#{SOURCES}/#{library}"
  arflags = ""
 
  domake("#{dir}", action, objs, hdrs, cppflags, cflags, arflags, out, "lib#{library}.a")
- FileUtils.rm_r "#{SOURCES}/#{library}/Makefile"`
+ FileUtils.rm_r "#{SOURCES}/#{library}/Makefile"
  print "done"
  
 
