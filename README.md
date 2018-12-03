@@ -16,15 +16,22 @@ build command builds the .c and .cpp files into .o files and then compiles into 
 
     ./build.rb build arduino
     ./build.rb build Wire
-  
+    ./build.rb build all
+    or
+    ./build.exe build arduino
+    ./build.exe build all
+
    clean command deletes all .o files:
    
     ./build.rb clean arduino
-    
+    ./build.rb clean all
+    or
+    ./build.exe clean all
    rebuild command cleans then builds:
    
     ./build.rb rebuild arduino
-    
+    ./build.rb rebuild all
+    ./build.exe rebuild all
 and afterwards, you'll have the relevant header files and compiled libraries in the `output/lib and output/include` directory
 
 There are three possible options for every library
