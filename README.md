@@ -6,7 +6,7 @@ https://www.reddit.com/r/AskProgramming/comments/a19cdv/can_someone_show_me_how_
 
 # Usage
 
-1. build -- This will build the library. It will copy all the header files first to `output/include`. It outputs the library to the `output/lib`
+1. build -- This will build the library. It will copy all the header files first to `output/include`. It outputs the library to the `output/lib`if your libraries are interdependent try running build all so that all the header files get included
 2. clean -- This will remove all the compiled files from the src directory. It will not remove files from the output directory
 3. rebuild -- will clean and then build
 
