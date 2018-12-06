@@ -17,11 +17,11 @@ build command builds the .c and .cpp files into .o files and then compiles into 
 
     ./build.rb build arduino
     ./build.rb build Wire
-	./build.rb build all
+    ./build.rb build all
 	or
-	./build.exe build arduino
+    ./build.exe build arduino
     ./build.exe build Wire
-    ./build.exe build 
+    ./build.exe build all
 	
    clean command deletes all .o files:
    
