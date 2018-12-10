@@ -1,24 +1,69 @@
 #!/bin/ruby
 require 'fileutils'
-VARIANT='standard' #where to get the `pins_arduino.h` file
-CPUFREQ="16000000UL"
-MCU="atmega644pa"
+require 'inifile'
+require 'io/console'                                                                                                       
 
-CFLAGS="-Os -Wl,--gc-sections -ffunction-sections  -fdata-sections"
-CPPFLAGS="-Os -Wl,--gc-sections -ffunction-sections  -fdata-sections"
-ARFLAGS=""
+action = ARGV[0] 
+library = ARGV[1]
+if action == "help"
+  print "\n"
+  puts 'usage: ./build.exe action argument'
+  print "\n"
+  puts '-action: '
+  puts 'build, rebuild, compile, clean, '
+  puts '--build: builds a specified library, ourputs binary'
+  puts '--clean: cleans .o files from specified library, no arguments removes .hex and .elf files'
+  puts '--rebuild: cleans then builds a specified library'
+  puts '--compile: builds .cpp file in main directory, outputs .elf and .hex file'
+  print "\n"
+  puts '-argument'
+  puts '--library: builds, rebuilds, or cleans specific library in src folder'
+  puts '--all: builds, rebuilds, or cleans all libraries in src folder'
+  exit
+end
 
+# read an existing file
+file = IniFile.load('bin/settings.ini',:comment => ';')
+data = file["Settings"]
+CODENAME=data["CODENAME"] #here to get the .cpp code
+VARIANT=data["VARIANT"] #where to get the `pins_arduino.h` file
+CPUFREQ=data["CPUFREQ"]
+MCU=data["MCU"]
+CFLAGS=data["CFLAGS"]
+CPPFLAGS=data["CPPFLAGS"]
+ARFLAGS=data["ARFLAGS"]
 CC="avr-gcc"
 CPP="avr-g++"
 AR="avr-ar"
-
-
-SOURCES="src"
-OUTPUTS="output"
+OBJC ="avr-objcopy"
+SOURCES=data["SOURCES"]
+OUTPUTS=data["OUTPUTS"]
 OUT = "../../#{OUTPUTS}"
 CCFLAGS = "-I#{OUT}/include -I./#{SOURCES}/ -I./ -I./utility/ -I./variants/#{VARIANT} -I./#{OUTPUTS}/include -mmcu=#{MCU} -DF_CPU=#{CPUFREQ}"
 
-require 'io/console'                                                                                                       
+print "\n"
+print "Variant Pin Definition Folder: "
+puts VARIANT
+print "CPU Frequency: "
+puts CPUFREQ
+print "MCU: "
+puts MCU
+print "CFLAGS: "
+puts CFLAGS
+print "CPPFLAGS: "
+puts CPPFLAGS
+print "ARFLAGS: "
+puts ARFLAGS
+print "Source Folder:" 
+puts SOURCES
+print "Output Folder:" 
+puts OUTPUTS
+FileUtils.mkdir_p "#{OUTPUTS}/include"
+FileUtils.mkdir_p "#{OUTPUTS}/lib"
+FileUtils.mkdir_p "#{OUTPUTS}/codes"
+`cp variants/#{VARIANT}/*.h #{OUTPUTS}/include/`
+print "\n-------------------------Program Start---------------------------------\n"
+
 def continue_story                                                                                                               
   print "Press Any Key to Continue"                                                                                                    
   STDIN.getch                                                                                                              
@@ -40,7 +85,7 @@ if lib == "all"
   |f| puts f 
   library = f
   dir="#{SOURCES}/#{library}"
-` cp template.makefile #{SOURCES}/#{library}/Makefile`
+` cp ./bin/template.makefile #{SOURCES}/#{library}/Makefile`
   objs = getfiles(dir, "c").gsub(".c",".o");
   objs += " "+getfiles(dir, "cpp").gsub(".cpp", ".o");
   print "\n"
@@ -52,7 +97,7 @@ if lib == "all"
 else
  library = lib
  dir="#{SOURCES}/#{library}"
-`cp template.makefile #{SOURCES}/#{library}/Makefile`
+`cp ./bin/template.makefile #{SOURCES}/#{library}/Makefile`
  objs = getfiles(dir, "c").gsub(".c",".o");
  objs += " "+getfiles(dir, "cpp").gsub(".cpp", ".o");
  print "\n"
@@ -71,28 +116,54 @@ def domake(src, action, objs,hdrs, cppflags, cflags, arflags, out, lib)
   #make sure to redirect STDOUT to STDERR so it's visible
 end
 
+if action == "build" || action == "rebuild"
 if ARGV.length < 2
   puts 'usage: ./build.rb action library'
   continue_story
   exit
 end
-
-#`mkdir -p output/include` #syntax error
-#`mkdir -p output/lib`
-require 'fileutils'
-FileUtils.mkdir_p 'output/include'
-FileUtils.mkdir_p 'output/lib'
-`cp variants/#{VARIANT}/pins_arduino.h #{OUTPUTS}/include/`
-
-action = ARGV[0] 
-library = ARGV[1]
-
 docompile(library, "init")
 docompile(library, action)
-
 print "\n"
 print "Library Compilation Done"
 print "\n"
+end
+if action == "clean"
+ docompile(library, action)
+if ARGV.length <2
+`cp ./bin/template.makefile ./Makefile`
+`make #{action}2  OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
+`rm -f ./Makefile"`
+print "\n"
+print ".hex &. elf Files Cleaned"
+end
+print "\n"
+print "Clean Done"
+print "\n"
+end
+if action == "compile"
+ `cp ./bin/template.makefile ./Makefile`
+ cflags = CCFLAGS
+ cppflags = cflags
+ arflags = ""
+ `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
+ `rm -f ./Makefile"`
+ print "\n"
+ print "Compilation Done"
+ print "\n"
+end
+if action == "upload"
+ `cp ./bin/template.makefile ./Makefile`
+ cflags = CCFLAGS
+ cppflags = cflags
+ arflags = ""
+ `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
+ `rm -f ./Makefile"`
+ print "\n"
+ print "Compilation Done"
+ print "\n"
+end
+
 
 
 
