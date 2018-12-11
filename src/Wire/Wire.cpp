@@ -27,7 +27,6 @@ extern "C" {
 }
 
 #include "Wire.h"
-
 // Initialize Class Variables //////////////////////////////////////////////////
 
 uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];

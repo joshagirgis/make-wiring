@@ -16,11 +16,13 @@ init:
 	cp ${HDRS} ${OUTPUTS}/include/
 	
 compile: 
-	${CPP} ${CFLAGS} ${CODENAME}.cpp -o ./${OUTPUTS}/codes/${CODENAME}.elf -L${OUTPUTS}/lib/ -I./${OUTPUTS}/include -lArduino
+	${CPP} ${CFLAGS} ${CODENAME}.cpp -o ./${OUTPUTS}/codes/${CODENAME}.elf -L${OUTPUTS}/lib/ -I./${OUTPUTS}/include -lWire -lArduino
 	avr-objcopy -O ihex -R .eeprom ./${OUTPUTS}/codes/${CODENAME}.elf ./${OUTPUTS}/codes/${CODENAME}.hex
 
 upload:
-	avrdude -c stk500 -P usb -p m644 -U flash:w:./${OUTPUTS}/codes/${CODENAME}.hex
+	${CPP} ${CFLAGS} ${CODENAME}.cpp -o ./${OUTPUTS}/codes/${CODENAME}.elf -L${OUTPUTS}/lib/ -I./${OUTPUTS}/include -lWire -lArduino
+	avr-objcopy -O ihex -R .eeprom ./${OUTPUTS}/codes/${CODENAME}.elf ./${OUTPUTS}/codes/${CODENAME}.hex
+	avrdude -c stk500 -P com17 -p m644p -U flash:w:./${OUTPUTS}/codes/${CODENAME}.hex
 	
 clean:
 	rm -f $(OBJS) 
