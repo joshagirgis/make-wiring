@@ -1,5 +1,11 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <LowPower.h>
+#include <TinyGPSplusplus.h>  //gps lib
+#include <ReceiveOnlySoftwareSerial.h>
+#include <INA219.h>
+ReceiveOnlySoftwareSerial gpsSer(6); // RX
+
 void i2C_Scanner() { //scans i2c bus line
   byte error, address;
   int nDevices;
@@ -38,8 +44,11 @@ int main(void){
   Wire.begin();
   Serial.begin(9600);
   pinMode(4,OUTPUT);
+  Serial.println("Start");
+  delay(3000);
+  
   for (;;) {
-  i2C_Scanner();
+  /*i2C_Scanner();
   digitalWrite(4, HIGH);   // turn the LED on (HIGH is the voltage level)
   delay(100);              
   digitalWrite(4, LOW);    // turn the LED off by making the voltage LOW
@@ -61,7 +70,7 @@ int main(void){
   Serial.println(analogRead(A6)*5.0/1023);
   Serial.print("\t");
   Serial.println(analogRead(A7)*5.0/1023);
-  delay(1000);
+  delay(1000);*/
   }
   return 0;
 }    
