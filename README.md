@@ -63,29 +63,3 @@ It should be straight forward to map your board's configuration to this build fi
 You can also tweak other parameters like `CFLAGS` to your liking as well.
 
 
-
-
-
-# I Havent gotten below this yet in my porting processs
-
-
-
-# Usage from within programs
-
-After compiling your dependent libraries, using them from your own programs is easy.
-
-    avr-g++ -o hello.elf hello.c ${CFLAGS} -L~/make-wiring/output/lib -I~/make-wiring/output/include -lSoftwareSerial -lWire -lArduino
-
-Of course, yours will probably vary, but you get the point. Everything is put in one simple place, the output directory.
-
-# Updating
-
-I pulled these from Master on Arduino at the moment. If you want to update (or downgrade), it's trivial.
-
-1. Clone the [Arduino](https://github.com/arduino/Arduino) git repository
-2. Checkout the appropriate version
-3. `cp -r Arduino/libraries/* make-wiring/src/`
-4. `cp -r Arduino/hardware/arduino/cores/* make-wiring/src/`
-
-Note, this puts "cores" as "libraries" while this isn't really the case. So, basically, don't build both `robot` and `arduino`. 
-They conflict with each other
