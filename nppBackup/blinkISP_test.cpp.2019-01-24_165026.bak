@@ -1,0 +1,29 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <TinyGPSplusplus.h>  //gps lib
+#include <ReceiveOnlySoftwareSerial.h>
+#include <INA219.h>
+#include <EEPROM.h> 
+#include <CN0349.h>
+#include <avr/io.h> 
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include <avr/power.h>
+
+
+void startup(void){
+  init();
+  pinMode(22, OUTPUT); 
+  digitalWrite(22,HIGH); //LED on
+  pinMode(8, OUTPUT); 
+  digitalWrite(8,HIGH); //Sensors on
+ 
+}
+	
+int main(void){  
+    startup(); // place after sleep ends
+	delay(1000);
+}
+
+
+

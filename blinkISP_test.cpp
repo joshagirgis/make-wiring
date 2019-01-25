@@ -1,10 +1,18 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <LowPower.h>
 #include <TinyGPSplusplus.h>  //gps lib
 #include <ReceiveOnlySoftwareSerial.h>
 #include <INA219.h>
-ReceiveOnlySoftwareSerial gpsSer(6); // RX
+#include <EEPROM.h> 
+#include <CN0349.h>
+#include <avr/io.h> 
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include <avr/power.h>
+#include <util/delay.h>
+#include <stdlib.h>
+ReceiveOnlySoftwareSerial gpsSer(PB2); // RX
+TinyGPSPlus gps; //intialize GPS
 
 void i2C_Scanner() { //scans i2c bus line
   byte error, address;
@@ -38,40 +46,67 @@ void i2C_Scanner() { //scans i2c bus line
     Serial.println("done\n");
 };
 
+String gpsSensor() {
+  String deg_latCoord;
+  String deg_lonCoord;
+  String latCoord;
+  String lonCoord;
+  String latCoord1;
+  String lonCoord1;
+  double decimal_degrees;
+  double minutes_lon;
+  double minutes_lat;
+  double seconds;
+  double tenths;
+  int lat_degr;
+  int lon_degr;
+  String coord;
+  unsigned long howLong = 3000;
+  unsigned long startedAt = millis();
+  while (millis() - startedAt < howLong) {
+    if (gpsSer.available()) {
+      char c = gpsSer.read();
+      gps.encode(c);
+      //Serial.write(c);
+      if (gps.location.isUpdated()) {
+        deg_latCoord = String(gps.location.lat(), 10);
+        deg_lonCoord = String(gps.location.lng(), 10);
+        //lat
+        decimal_degrees = deg_latCoord.toFloat();
+        lat_degr = int(decimal_degrees);
+        minutes_lat = fabs(((decimal_degrees) - (lat_degr)) * 60.0);
 
-int main(void){
-  init();
-  Wire.begin();
-  Serial.begin(9600);
-  pinMode(4,OUTPUT);
-  Serial.println("Start");
-  delay(3000);
-  
-  for (;;) {
-  /*i2C_Scanner();
-  digitalWrite(4, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(100);              
-  digitalWrite(4, LOW);    // turn the LED off by making the voltage LOW
-  delay(100); 
-  digitalWrite(4, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(200);
-  Serial.println(analogRead(A0)*5.0/1023);
-  Serial.print("\t");
-  Serial.println(analogRead(A1)*5.0/1023);
-  Serial.print("\t");
-  Serial.println(analogRead(A2)*5.0/1023);
-  Serial.print("\t");
-  Serial.println(analogRead(A3)*5.0/1023);
-  Serial.print("\t");
-  Serial.println(analogRead(A4)*5.0/1023);
-  Serial.print("\t");
-  Serial.println(analogRead(A5)*5.0/1023);
-  Serial.print("\t");
-  Serial.println(analogRead(A6)*5.0/1023);
-  Serial.print("\t");
-  Serial.println(analogRead(A7)*5.0/1023);
-  delay(1000);*/
+        latCoord1 = String(int(lat_degr)) + String((minutes_lat), 4);
+        //lon
+        decimal_degrees = deg_lonCoord.toFloat();
+        lon_degr = int(decimal_degrees);
+        minutes_lon = fabs(((decimal_degrees) - (lon_degr)) * 60.0);
+
+        lonCoord1 = String(int(lon_degr)) + String((minutes_lon), 4);
+        coord = latCoord1 + "_" + lonCoord1;
+        return coord;
+        break;
+
+      }
+    }
   }
-  return 0;
-}    
+  // transmitGPS = "4488.7667_-6870.3348";
+}
 
+int main(){
+	init();
+	DDRD |= 1 << PIND6;  //set Port D -> PD6 to OUTPUT without changing current settings
+	PORTD |= 1 << PIND6; //SET PD6 to HIGH -> turns ON onboard 4 Volt and 3.3v volt Regulators
+	DDRD |= 1 << PIND4;  //set Port D -> PD4 to OUTPUT without changing current settings
+	Serial.begin(9600);
+	Wire.begin();
+	while (1){
+		PORTD ^= 1 << PIND4; //FLIP onboard LED output
+		_delay_ms(100);
+		Serial.println("HIjoshai");
+		i2C_Scanner();
+		delay(1000);
+	}
+   return(0);
+
+}

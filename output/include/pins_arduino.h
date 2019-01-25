@@ -294,7 +294,7 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[NUM_DIGITAL_PINS] =
 
 const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[NUM_DIGITAL_PINS] =
 {
-  _BV(0), // D0 PD0
+  _BV(0), // D0 PD0digi
   _BV(1), // D1 PD1
   _BV(2), // D2 PD2
   _BV(3), // D3 PD3

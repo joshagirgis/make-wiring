@@ -1,0 +1,14 @@
+
+#include <avr/io.h> 
+
+int main(){
+   DDRD = 0b00010000;
+   PORTD = 0b00010000;
+   //Loop forever
+   for(;;){
+
+   }
+
+   return(0);
+
+}

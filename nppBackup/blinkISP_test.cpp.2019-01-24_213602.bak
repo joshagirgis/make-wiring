@@ -1,0 +1,25 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <TinyGPSplusplus.h>  //gps lib
+#include <ReceiveOnlySoftwareSerial.h>
+#include <INA219.h>
+#include <EEPROM.h> 
+#include <CN0349.h>
+#include <avr/io.h> 
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include <avr/power.h>
+#include <util/delay.h>
+#include <stdlib.h>
+
+int main(){
+	init();
+	DDRD |= 1 << PIND4; 
+	while (1){
+		PORTD ^= 1 << PIND4;
+		_delay_ms(100);
+		Serial.println("HIjoshai");
+	}
+   return(0);
+
+}

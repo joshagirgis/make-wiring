@@ -1,0 +1,47 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <TinyGPSplusplus.h>  //gps lib
+#include <ReceiveOnlySoftwareSerial.h>
+#include <INA219.h>
+#include <EEPROM.h> 
+#include <CN0349.h>
+#include <avr/io.h> 
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include <avr/power.h>
+#include "usart.h"
+
+void startup(void){
+  init();
+  Serial.begin(9600);
+  pinMode(22, OUTPUT); 
+  digitalWrite(22,HIGH); //LED on
+  pinMode(8, OUTPUT); 
+  digitalWrite(8,HIGH); //Sensors on
+ 
+}
+	
+int main(void){  
+    startup(); // place after sleep ends
+	Serial.println("hijsoh");
+	for(;;){
+		usart_set_baud(&usart0, USART_BAUD_RATE_9600);
+		usart_enable_writing(&usart0);
+		usart_write(&usart0, 'H');
+		usart_write(&usart0, 'e');
+		usart_write(&usart0, 'l');
+		usart_write(&usart0, 'l');
+		usart_write(&usart0, 'o');
+		usart_write(&usart0, ' ');
+		usart_write(&usart0, 'W');
+		usart_write(&usart0, 'o');
+		usart_write(&usart0, 'r');
+		usart_write(&usart0, 'l');
+		usart_write(&usart0, 'd');
+		usart_write(&usart0, '!');
+		delay(1000);
+	}
+}
+
+
+

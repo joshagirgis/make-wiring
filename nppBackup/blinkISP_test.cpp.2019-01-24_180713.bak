@@ -1,0 +1,65 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <TinyGPSplusplus.h>  //gps lib
+#include <ReceiveOnlySoftwareSerial.h>
+#include <INA219.h>
+#include <EEPROM.h> 
+#include <CN0349.h>
+#include <avr/io.h> 
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include <avr/power.h>
+#ifndef F_CPU
+#define F_CPU 1600000UL
+#endif
+
+// set baud if not set
+#ifndef BAUD
+#define BAUD 9600
+#endif
+#define BAUDRATE ((F_CPU/(BAUD*16UL))-1)   // Baud in bits per second
+
+void startup(void){
+  init();
+  pinMode(22, OUTPUT); 
+  digitalWrite(22,HIGH); //LED on
+  pinMode(8, OUTPUT); 
+  digitalWrite(8,HIGH); //Sensors on
+ 
+}
+
+void uart_init(void)
+{
+    // enable transmitter and receiver
+    UCSR0B |= (1 << TXEN0)|(1<<RXEN0);
+    // set 2 stop bits, 8 bit data
+    UCSR0C = (1<<USBS0)|(3<<UCSZ00);
+    // set baud
+    UBRR0H = BAUDRATE >> 8; // Put high 8 bits in H register
+    UBRR0L = BAUDRATE;        // Put low 8 bits in L register
+}
+
+void uart_transmit (unsigned char data)
+{
+    // if newline, also print carriage return
+    if(data == '\n') uart_transmit('\r');
+    // wait for transmitter
+    while(!(UCSR0A & (1 << UDRE0)));
+    // send data
+    UDR0 = data;
+}
+
+
+int main(){
+   startup();
+   uart_init();
+   uart_transmit('H');
+   //Loop forever
+   while(1){
+
+
+   }
+
+   return(0);
+
+}

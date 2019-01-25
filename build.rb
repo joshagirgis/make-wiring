@@ -163,7 +163,26 @@ if action == "upload"
  print "Compilation Done"
  print "\n"
 end
-
-
-
+if action == "seteeprom"
+ `cp ./bin/template.makefile ./Makefile`
+ cflags = CCFLAGS
+ cppflags = cflags
+ arflags = ""
+ `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
+ `rm -f ./Makefile"`
+ print "\n"
+ print "Compilation Done"
+ print "\n"
+end
+if action == "defaultfuse"
+ `cp ./bin/template.makefile ./Makefile`
+ cflags = CCFLAGS
+ cppflags = cflags
+ arflags = ""
+ `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
+ `rm -f ./Makefile"`
+ print "\n"
+ print "Compilation Done"
+ print "\n"
+end
 

@@ -45,7 +45,16 @@ http://arduiniana.org.
 #include <avr/pgmspace.h>
 #include <Arduino.h>
 #include <ReceiveOnlySoftwareSerial.h>
-//
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <math.h>
+
+#include <avr/pgmspace.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#include "binary.h"
 // Lookup table
 //
 typedef struct _DELAY_TABLE
@@ -59,7 +68,7 @@ typedef struct _DELAY_TABLE
 
 #if F_CPU == 16000000
 
-static const DELAY_TABLE table[]  = 
+static const DELAY_TABLE table[] PROGMEM = 
 {
   //  baud    rxcenter   rxintra    rxstop    tx
   { 115200,   1,         17,        17,       12,    },
@@ -81,7 +90,7 @@ const int XMIT_START_ADJUSTMENT = 5;
 
 #elif F_CPU == 8000000
 
-static const DELAY_TABLE table[]  = 
+static const DELAY_TABLE table[] PROGMEM = 
 {
   //  baud    rxcenter    rxintra    rxstop  tx
   { 115200,   1,          5,         5,      3,      },
@@ -106,7 +115,7 @@ const int XMIT_START_ADJUSTMENT = 4;
 // 20MHz support courtesy of the good people at macegr.com.
 // Thanks, Garrett!
 
-static const DELAY_TABLE table[] =
+static const DELAY_TABLE table[] PROGMEM=
 {
   //  baud    rxcenter    rxintra    rxstop  tx
   { 115200,   3,          21,        21,     18,     },
