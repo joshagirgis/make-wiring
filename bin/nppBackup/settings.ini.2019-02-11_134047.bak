@@ -1,0 +1,13 @@
+[Settings]
+CODENAME=ECOBfirmware ;without cpp
+PROGRAMMER = stk500
+PROGMPORT=COM17
+READCOMPORT=COM18
+CPUFREQ="16000000UL"
+MCU="atmega644pa"
+VARIANT='standard' ;where to get the `pins_arduino.h` file
+CFLAGS="-Os -Wl,--gc-sections -ffunction-sections -fdata-sections"
+CPPFLAGS="-Os -Wl,--gc-sections -ffunction-sections -fdata-sections"
+ARFLAGS=""
+SOURCES="src"
+OUTPUTS="output"

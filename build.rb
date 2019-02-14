@@ -26,9 +26,17 @@ end
 file = IniFile.load('bin/settings.ini',:comment => ';')
 data = file["Settings"]
 CODENAME=data["CODENAME"] #here to get the .cpp code
+PROGRAMMER=data["PROGRAMMER"] #programmer type
+LIBS= data["LIBS"]
+Llibraries= LIBS.split(' ')
+temp =Llibraries.map{|item| "-l"+item}
+LibString= temp.join(" ")
+LibString.delete("'")
+COMPORT=data["COMPORT"]
 VARIANT=data["VARIANT"] #where to get the `pins_arduino.h` file
 CPUFREQ=data["CPUFREQ"]
 MCU=data["MCU"]
+PARTNO=data["PARTNO"]
 CFLAGS=data["CFLAGS"]
 CPPFLAGS=data["CPPFLAGS"]
 ARFLAGS=data["ARFLAGS"]
@@ -42,12 +50,18 @@ OUT = "../../#{OUTPUTS}"
 CCFLAGS = "-I#{OUT}/include -I./#{SOURCES}/ -I./ -I./utility/ -I./variants/#{VARIANT} -I./#{OUTPUTS}/include -mmcu=#{MCU} -DF_CPU=#{CPUFREQ}"
 
 print "\n"
-print "Variant Pin Definition Folder: "
-puts VARIANT
-print "CPU Frequency: "
-puts CPUFREQ
+print "PROGRAMMER: "
+puts PROGRAMMER
+print "COMPORT: "
+puts COMPORT
 print "MCU: "
 puts MCU
+print "LIBS: "
+puts LIBS
+print "PARTNO: "
+puts PARTNO
+print "CPU Frequency: "
+puts CPUFREQ
 print "CFLAGS: "
 puts CFLAGS
 print "CPPFLAGS: "
@@ -127,8 +141,7 @@ docompile(library, action)
 print "\n"
 print "Library Compilation Done"
 print "\n"
-end
-if action == "clean"
+elsif  action == "clean"
  docompile(library, action)
 if ARGV.length <2
 `cp ./bin/template.makefile ./Makefile`
@@ -140,49 +153,14 @@ end
 print "\n"
 print "Clean Done"
 print "\n"
-end
-if action == "compile"
+else
  `cp ./bin/template.makefile ./Makefile`
  cflags = CCFLAGS
  cppflags = cflags
  arflags = ""
- `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
+ `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}" COMPORT="#{COMPORT}" PROGRAMMER="#{PROGRAMMER}" PARTNO="#{PARTNO}" LIBSTRING="#{LibString}"`
  `rm -f ./Makefile"`
  print "\n"
  print "Compilation Done"
  print "\n"
 end
-if action == "upload"
- `cp ./bin/template.makefile ./Makefile`
- cflags = CCFLAGS
- cppflags = cflags
- arflags = ""
- `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
- `rm -f ./Makefile"`
- print "\n"
- print "Compilation Done"
- print "\n"
-end
-if action == "seteeprom"
- `cp ./bin/template.makefile ./Makefile`
- cflags = CCFLAGS
- cppflags = cflags
- arflags = ""
- `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
- `rm -f ./Makefile"`
- print "\n"
- print "Compilation Done"
- print "\n"
-end
-if action == "defaultfuse"
- `cp ./bin/template.makefile ./Makefile`
- cflags = CCFLAGS
- cppflags = cflags
- arflags = ""
- `make #{action} CPP="#{CPP}" OBJC="#{OBJC}" CFLAGS="#{CFLAGS} #{cflags}" OUTPUTS="#{OUTPUTS}" CODENAME="#{CODENAME}"`
- `rm -f ./Makefile"`
- print "\n"
- print "Compilation Done"
- print "\n"
-end
-

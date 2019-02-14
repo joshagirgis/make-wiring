@@ -1,0 +1,186 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <TinyGPSplusplus.h>  //gps lib
+#include <ReceiveOnlySoftwareSerial.h>
+#include <INA219.h>
+#include <EEPROM.h> 
+#include <CN0349.h>
+#include <SHT20.h>
+#include <NLSWDk.h>
+#include <avr/io.h> 
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+#include <avr/power.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+#include <stdlib.h>
+NLSWDK NL;
+ReceiveOnlySoftwareSerial gpsSer(6); 	// RX PB2 converts to pin6 in for atmega644pa Arduino variant
+TinyGPSPlus gps; 						//intialize GPS
+SHT20 TH;
+INA219 CV;
+
+void i2C_Scanner() { //scans i2c bus line
+  byte error, address;
+  int nDevices;
+  Serial.println("Scanning...");
+  nDevices = 0;
+  for (address = 1; address < 127; address++ ) {
+    // The i2c_scanner uses the return value of
+    // the Write.endTransmisstion to see if
+    // a device did acknowledge to the address.
+    Wire.beginTransmission(address);
+    error = Wire.endTransmission();
+    if (error == 0) {
+      Serial.print("I2C device found at address 0x");
+      if (address < 16)
+        Serial.print("0");
+      Serial.print(address, HEX);
+      Serial.println("  !");
+      nDevices++;
+    }
+    else if (error == 4) {
+      Serial.print("Unknown error at address 0x");
+      if (address < 16)
+        Serial.print("0");
+      Serial.println(address, HEX);
+    }
+  }
+  if (nDevices == 0)
+    Serial.println("No I2C devices found\n");
+  else
+    Serial.println("done\n");
+};
+
+String gpsSensor() {
+  String deg_latCoord;
+  String deg_lonCoord;
+  String latCoord;
+  String lonCoord;
+  String latCoord1;
+  String lonCoord1;
+  double decimal_degrees;
+  double minutes_lon;
+  double minutes_lat;
+  double seconds;
+  double tenths;
+  int lat_degr;
+  int lon_degr;
+  String coord;
+  unsigned long howLong = 3000;
+  unsigned long startedAt = millis();
+  while (millis() - startedAt < howLong) {
+    if (gpsSer.available()) {
+      char c = gpsSer.read();
+      gps.encode(c);
+      //Serial.write(c);
+      if (gps.location.isUpdated()) {
+        deg_latCoord = String(gps.location.lat(), 10);
+        deg_lonCoord = String(gps.location.lng(), 10);
+        //lat
+        decimal_degrees = deg_latCoord.toFloat();
+        lat_degr = int(decimal_degrees);
+        minutes_lat = fabs(((decimal_degrees) - (lat_degr)) * 60.0);
+
+        latCoord1 = String(int(lat_degr)) + String((minutes_lat), 4);
+        //lon
+        decimal_degrees = deg_lonCoord.toFloat();
+        lon_degr = int(decimal_degrees);
+        minutes_lon = fabs(((decimal_degrees) - (lon_degr)) * 60.0);
+
+        lonCoord1 = String(int(lon_degr)) + String((minutes_lon), 4);
+        coord = latCoord1 + "_" + lonCoord1;
+        return coord;
+        break;
+
+      }
+    }
+  }
+  // transmitGPS = "4488.7667_-6870.3348";
+}
+
+String acquireData() { //Do stuff! acquire and format data for modem. is called in sendData()
+  String dataLine = "";
+  //Start Data taking
+  String signalS = NL.signalStrength(); //get signal strength from modem
+  signalS.trim(); //get rid of garbage characters
+  String conductivity;
+  String tempC;
+  String sal;
+  conductivity = String("hi");
+  tempC = String("joshua");
+  sal = String("yo");
+  dataLine += "signal=" + signalS;
+  dataLine += "&";
+  dataLine += "condcalib=calibon";
+  dataLine += "&";
+  dataLine += "cond=" + conductivity;
+  dataLine += "&";
+  dataLine += "sal=" + sal;
+  dataLine += "&";
+  dataLine += "temp=" + tempC;
+  dataLine += "&";
+  dataLine += "GPSdata=" + gpsSensor();
+  dataLine += "&";
+  dataLine += "volts=powerstuff";
+  dataLine += "&";
+  dataLine += "humid=himitiynow";
+  dataLine += "&";
+  dataLine += "interTemp=timpnow";
+  dataLine += "&";
+  dataLine += "chloro=stuff";
+  return dataLine;
+}
+
+int main(){
+	init();
+	pinMode(23, OUTPUT);  // SW_RTS pin (must be driven low if unused)
+	digitalWrite(23, LOW);  // Turn on Skywire modem
+	delay(250); // modem requires >1s pulse
+	pinMode(23, INPUT);  // Return I/O pin 12 to input/hi-Z state
+	
+	DDRD |= 1 << PIND4;  								//LED ->set Port D -> PD4 to OUTPUT without changing current settings
+	PORTD |= 1 << PIND4; 								//FLIP onboard LED ON
+
+	DDRD |= 1 << PIND6;  								//set Port D -> PD6 to OUTPUT without changing current settings
+	PORTD |= 1 << PIND6; 								//SET PD6 to HIGH -> turns ON onboard 4 Volt and 3.3v volt Regulators
+
+	
+	Wire.begin();
+	NL.modemSetup();
+	Serial.println("Begin!");
+	
+
+	gpsSer.begin(9600);
+	CV.begin(0x41);										// Default INA219 address is 0x40 JP2 bridged = 0x41
+	CV.configure(INA219_RANGE_32V, INA219_GAIN_320MV, INA219_BUS_RES_12BIT, INA219_SHUNT_RES_12BIT_1S);
+	CV.calibrate(0.1, 2);								// Calibrate INA219. Rshunt = 0.1 ohm, Max excepted current = 2A
+	while (1){
+		String stuffData = acquireData();
+		Serial.println(stuffData);
+		NL.sendData(stuffData,"0a2a70e7069f0481fb23bc3a72ba5c9a5edad4a3");
+		while (! Serial){
+		float temp = TH.readTemperature(); 				//Read Temperature
+		float humid = TH.readHumidity();   				//Read Humiditiy
+		Serial.println(temp, 1); 
+		Serial.println(humid, 1);  						//Print Temperature and Humidity
+		Serial.println(gpsSensor());					//Print GPS location
+		Serial.print("Source voltage:   ");				//Print Power stats
+		Serial.print(CV.readBusVoltage(), 5);
+		Serial.println(" V");	
+
+		Serial.print("Power Consumption:     ");
+		Serial.print(CV.readBusPower(), 5);
+		Serial.println(" W");
+
+		Serial.print("Curent Draw: ");
+		Serial.print(CV.readShuntCurrent(), 5);
+		Serial.println(" A");
+		delay(1000);
+		}
+		
+		//Serial.println(analogRead(A1)*5.0/1023);
+	}
+   return(0);
+
+}
