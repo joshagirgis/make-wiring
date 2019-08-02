@@ -4,6 +4,9 @@ Porting Earlz code to windows with minor adjustments for functunality.
 the full thought process is posted here.
 https://www.reddit.com/r/AskProgramming/comments/a19cdv/can_someone_show_me_how_to_implement_this_github/
 
+# Requirements
+Winavr: https://sourceforge.net/projects/winavr/
+
 # Usage
 
 1. build -- This will build the library. It will copy all the header files first to `output/include`. It outputs the library to the `output/lib`if your libraries are interdependent try running build all so that all the header files get included
