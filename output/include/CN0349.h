@@ -1,42 +1,64 @@
 /*
-  CN0349.h
+  CN0349.cpp
+  Copyright (c) 2019 Joshua Girgis.  All right reserved.
+   This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #ifndef CN0349_h
 #define CN0349_h
 
-#include "Arduino.h"
 #include <Wire.h>// used for I2C communication
 #include "avr/pgmspace.h"
 #define AD5934_ADDR 0x0D   //i2c addresses of CN-0349
 #define ADG715_ADDR 0x48
 #include <EEPROM.h> 
+#include <stdlib.h>
+#include <inttypes.h>
+#include <util/delay.h>
+#include <math.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Constants
 ///////////////////////////////////////////////////////////////////////////////////////////
 //cn-0349
-const float CLOCK_SPEED = 16.776 * pow(10, 6); // AD5934 has internal clock of 16.776 MHz
-const int validImpedanceData = 2;   //when the data is good
-const int validSweep = 4;   // when the sweep is over
+const float PROGMEM CLOCK_SPEED = 1 * pow(10, 6);//16.776 * pow(10, 6); // AD5934 input clock of 1 MHz (on board clock generator)
+const uint8_t PROGMEM validImpedanceData = 2;   //when the data is good
+const uint8_t PROGMEM validSweep = 4;   // when the sweep is over
 //const float alpha = 0.021; // 2.1%°C is the temperature coefficient at 25°C for sea water
-const float R2 = 100;
-const float R3 = 100;
-const float R4 = 1000;
-const float R7 = 10000;
-const float R8 = 1000;
-const float R9 = 100;
-
+//Resistors:
+const float PROGMEM R2 = 100;
+const float PROGMEM R3 = 100;
+const float PROGMEM R4 = 1000;
+const float PROGMEM R7 = 10000;
+const float PROGMEM R8 = 1000;
+const float PROGMEM R9 = 100;
+const uint8_t PROGMEM GF_low_addr =1;
+const uint8_t PROGMEM NOS_low_addr=4;
+const uint8_t PROGMEM GF_high_addr=6;
+const uint8_t PROGMEM NOS_high_addr=12;
+const uint8_t PROGMEM calibState_addr=32;
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Register Map of CN-0349
 ///////////////////////////////////////////////////////////////////////////////////////////
-const int CONTROL_REGISTER[2] =                    { 0x80, 0x81       }; // see mapping below
-const int START_FREQUENCY_REGISTER[3] =            { 0x82, 0x83, 0x84 }; // 24 bits for start frequency
-const int FREQ_INCREMENT_REGISTER[3] =             { 0x85, 0x86, 0x87 }; // 24 bits for frequency increment
-const int NUM_INCREMENTS_REGISTER[2] =             { 0x88, 0x89       }; //  9 bits for # of increments
-const int NUM_SETTLING_CYCLES_REGISTER[2] =        { 0x8A, 0x8B       }; //  9 bits + 1 modifier for # of settling times
-const int STATUS_REGISTER[1] =                     { 0x8F             }; // see mapping below
-const int REAL_DATA_REGISTER[2] =                  { 0x94, 0x95       }; // 16-bit, twos complement format
-const int IMAG_DATA_REGISTER[2] =                  { 0x96, 0x97       }; // 16-bit, twos complement format
+const uint8_t PROGMEM CONTROL_REGISTER[2] =                    { 0x80, 0x81       }; // see mapping below
+const uint8_t PROGMEM START_FREQUENCY_REGISTER[3] =            { 0x82, 0x83, 0x84 }; // 24 bits for start frequency
+const uint8_t PROGMEM FREQ_INCREMENT_REGISTER[3] =             { 0x85, 0x86, 0x87 }; // 24 bits for frequency increment
+const uint8_t PROGMEM NUM_INCREMENTS_REGISTER[2] =             { 0x88, 0x89       }; //  9 bits for # of increments
+const uint8_t PROGMEM NUM_SETTLING_CYCLES_REGISTER[2] =        { 0x8A, 0x8B       }; //  9 bits + 1 modifier for # of settling times
+const uint8_t PROGMEM STATUS_REGISTER[1] =                     { 0x8F             }; // see mapping below
+const uint8_t PROGMEM REAL_DATA_REGISTER[2] =                  { 0x94, 0x95       }; // 16-bit, twos complement format
+const uint8_t PROGMEM IMAG_DATA_REGISTER[2] =                  { 0x96, 0x97       }; // 16-bit, twos complement format
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Control register map @ 0x80, 0x81 of CN-0349
@@ -46,13 +68,13 @@ const int IMAG_DATA_REGISTER[2] =                  { 0x96, 0x97       }; // 16-b
 //0x81 contains D7 to D0
 
 // Control register map (D15 to D12)
-const int DEFAULT_VALUE =  B0000; // initial setting
-const int INITIALIZE    =  B0001; // excite the unknown impedance initially
-const int START_SWEEP   =  B0010; // begin the frequency sweep
-const int INCREMENT     =  B0011; // step to the next frequency point
-const int REPEAT_FREQ   =  B0100; // repeat the current frequency point measurement
-const int POWER_DOWN    =  B1010; // VOUT and VIN are connected internally to ground
-const int STANDBY       =  B1011; // VOUT and VIN are connected internally to ground
+const uint8_t PROGMEM DEFAULT_VALUE =  0b0000; // initial setting
+const uint8_t PROGMEM INITIALIZE    =  0b0001; // excite the unknown impedance initially
+const uint8_t PROGMEM START_SWEEP   =  0b0010; // begin the frequency sweep
+const uint8_t PROGMEM INCREMENT     =  0b0011; // step to the next frequency point
+const uint8_t PROGMEM REPEAT_FREQ   =  0b0100; // repeat the current frequency point measurement
+const uint8_t PROGMEM POWER_DOWN    =  0b1010; // VOUT and VIN are connected internally to ground
+const uint8_t PROGMEM STANDBY       =  0b1011; // VOUT and VIN are connected internally to ground
 
 // D11 = no operation
 
@@ -123,28 +145,25 @@ const int STANDBY       =  B1011; // VOUT and VIN are connected internally to gr
 
 class CN0349{
 	public:
-		void configureAD5934(int settlingTimes, float startFreq, float freqIncr, int numIncr);
-		void calibrateCN0349(char state, float* GF, float* GF_rtd, float* NOS); 
-		int  measure(float GF_rtd, float GF, double NOS, float slope, float intercept, char state, float* Y_cell, float* T_cell, float* YT_cell);  //high or low measurment ranges
- 	private:
-	    template <class T> int EEPROM_writeAnything(int ee, const T& value);
-	    template <class T> int EEPROM_readAnything(int ee, T& value);
+		void configureAD5934(uint8_t settlingTimes, float startFreq, float freqIncr, uint8_t numIncr);
 		float calibrate(double rcal, double rfb);
-	    int checkStatus();
-		boolean AD5934byteWrite(int address, int data);
-		int AD5934byteRead(int address);
-		byte frequencyCode(float freqInHz, int byteNum);
-		boolean setStartFrequency(float freqInHz);
-		boolean setFrequencyIncrement(float freqInHz);
-		boolean setNumberOfIncrements(int n);
-		boolean setNumberOfSettlingTimes(int n);
-		boolean setControlRegister(int code);
-		boolean setControlRegister2(); //initalize D11 D10 D9 D8 @0x80 Excitation Voltage 2.0Vp-p, Internal PGA=1
-		float sweep(int switch1, int switch2); //performs frequency sweep for real and unreal components, returns the magnitude
+		uint8_t measure(float GF_rtd, float GF, double NOS, float slope, float intercept, char state, float* T_imp, float* imp, float* Y_cell, float* T_cell, float* YT_cell); //high or low measurment ranges
+ 	private:
+	    uint16_t checkStatus();
+		bool AD5934byteWrite(uint8_t address, uint8_t data);
+		uint16_t AD5934byteRead(uint8_t address);
+		uint8_t frequencyCode(float freqInHz, uint8_t byteNum);
+		bool setStartFrequency(float freqInHz);
+		bool setFrequencyIncrement(float freqInHz);
+		bool setNumberOfIncrements(uint8_t n);
+		bool setNumberOfSettlingTimes(uint8_t n);
+		bool setControlRegister(uint8_t code);
+		bool setControlRegister2(); //initalize D11 D10 D9 D8 @0x80 Excitation Voltage 2.0Vp-p, Internal PGA=1
+		float sweep(uint8_t switch1, uint8_t switch2); //performs frequency sweep for real and unreal components, returns the magnitude
 		float tempcondtosal(float cond, float temp); //convert microsiemens to salinity, valid for 2 to 42 ppt
-		byte ADG715CH(int channel);   //checks channel numbers
-		byte ADG715read(byte channel);  //if channel exceeds 9, read all
-		void ADG715writeChannel(byte channel, byte state); //change status of a specified channel (1-8)
+		uint8_t ADG715CH(uint8_t channel);   //checks channel numbers
+		uint8_t ADG715read(uint8_t channel);  //if channel exceeds 9, read all
+		void ADG715writeChannel(uint8_t channel, uint8_t state); //change status of a specified channel (1-8)
 		void ADG715reset(); //clear out register
 		};
 #endif
