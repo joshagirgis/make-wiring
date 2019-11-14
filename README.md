@@ -18,10 +18,6 @@ list the command and then the library you wish to compile. List "all" if you wan
 
 build command builds the .c and .cpp files into .o files and then compiles into a .a file:
 
-    ./build.rb build arduino
-    ./build.rb build Wire
-    ./build.rb build all
-	or
     ./build.exe build arduino
     ./build.exe build Wire
     ./build.exe build all
@@ -50,19 +46,12 @@ There are three possible options for every library
 
 
 # Retargetting
-
-I could've crafted a crufty set of makefiles, but I chose this because it's RIDICULOUSLY EASY to retarget. 
-
-I have everything configured by default for atmega328p with the "standard" pin layout. This is trivial to change though. 
-Just open up build.rb and change the relevant files
+Change settings in bin/settings.ini
+For example: 16MHz Atmega328p
 
     VARIANT='standard' #where to get the `pins_arduino.h` file
     CPUFREQ="16000000UL"
     MCU="atmega328p"
-
-If you're unsure of your board's "variant", frequency, or other variables, you can look at `boards.txt` to get a few clues.
-It should be straight forward to map your board's configuration to this build file for easy building of libraries.
-
 You can also tweak other parameters like `CFLAGS` to your liking as well.
 
 
