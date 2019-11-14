@@ -24,6 +24,7 @@ Open monitor.exe and specify baud rate and com port to view a serial port. (you 
 
 # Settings
 Change settings in bin/settings.ini
+
 For example: 16MHz Atmega644pa using libraries Wire EEPROM and Arduino. Using avrgcc, compiling test.cpp and uploading it to the avr with an stk500 programmer on COM17.
 
     CODENAME=test ;without cpp
@@ -40,13 +41,20 @@ For example: 16MHz Atmega644pa using libraries Wire EEPROM and Arduino. Using av
     SOURCES="src"
     OUTPUTS="output"
  CODENAME is your code's file name without the cpp. This code is located in the main directory
+ 
  LIBS is the external libraries in the ./src directory. NOTE: make sure Arduino is last if using native arduino libraries like Wire or EEPROM.
+ 
  PROGRAMMER defines the ICSP programemr being used
+ 
  CPUFREQ is the Clock frequency your avr is to be used at (i.e 16MHz).
+ 
  MCU is the name of the avr
+ 
  PARTNO is another identifier for the avr
+ 
  Variant is where the pins_arduino.h file is located. This will allow you to use the arduino macros. For example:
  it will allow you to refer to pin PB0 on the avr as digital pin '8'
+ 
  Cflags and Cpp flags can be changed if needed
  
 # Command line interface
