@@ -53,7 +53,7 @@ For example: 16MHz Atmega644pa using libraries Wire EEPROM and Arduino. Using av
  PARTNO is another identifier for the avr
  
  Variant is where the pins_arduino.h file is located. This will allow you to use the arduino macros. For example:
- it will allow you to refer to pin PB0 on the avr as digital pin '8'
+ it will allow you to refer to pin PB0 on the avr as digital pin '8'. Make sure this file is the correct variant if you want to use the arduino core.
  
  Cflags and Cpp flags can be changed if needed
  
