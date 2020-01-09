@@ -44,7 +44,7 @@ For example: 16MHz Atmega644pa using libraries Wire EEPROM and Arduino. Using av
  
  LIBS is the external libraries in the ./src directory. NOTE: make sure Arduino is last if using native arduino libraries like Wire or EEPROM.
  
- PROGRAMMER defines the ICSP programemr being used
+ PROGRAMMER defines the ICSP programmer being used
  
  CPUFREQ is the Clock frequency your avr is to be used at (i.e 16MHz).
  
