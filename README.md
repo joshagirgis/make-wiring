@@ -61,10 +61,10 @@ For example: 16MHz Atmega644pa using libraries Wire EEPROM and Arduino. Using av
 1. build -- This will build and compile a specified library. It will first copy all the header files from every library to `output/include`. It then compiles all the libraries and then outputs the library binaries to the `output/lib`. If your libraries are interdependent try running build all so that all the header files get included. If there is an error in one library the command window will print the errors in the console.
 2. clean -- This will remove all the compiled .o files from the src directory. It will not remove files from the output directory
 3. rebuild -- will clean and then build
-4. compile -- compiles your .cpp file that is in the main directory. Errros will show in the command prompt.
+4. compile -- compiles your .cpp file that is in the main directory. Errors will show in the command prompt.
 5. upload -- will compile and convert the built binary files, stored in the output directory, into a .hex file and use avrdude to upload to the specified AVR.
 
-Usage is simple, make sure you have winAVR.
+Usage is simple, if you are having trouble first make sure you have winAVR.
 List the command and then the library you wish to compile. List "all" if you want to compile all the libraries in ./src/
 
 **build command compiles all the .c and .cpp library files into .o files and .a files** 
@@ -98,6 +98,7 @@ and the avr should reset and run the uploaded code
 
 
 At any time the user can delete the ouput folder. Rebuilding will make a new one.
+Take a look at the ruby source code .bin/raw/build.rb if you want to understand the code more
 
 
 
